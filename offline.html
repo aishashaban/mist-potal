@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MIST Portal — Offline</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #052e16, #14532d);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding: 24px;
+    }
+    .icon { font-size: 72px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+    h1 { font-size: 24px; font-weight: 900; color: #d1fae5; margin-bottom: 10px; }
+    p { font-size: 14px; color: #6ee7b7; line-height: 1.6; max-width: 320px; margin-bottom: 28px; }
+    .card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+      padding: 20px 24px;
+      max-width: 340px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    .card h2 { font-size: 14px; font-weight: 800; color: #d1fae5; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .tip { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; text-align: left; }
+    .tip span { font-size: 20px; flex-shrink: 0; }
+    .tip p { font-size: 12px; color: #a7f3d0; margin: 0; }
+    button {
+      background: white;
+      color: #14532d;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 28px;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.15s;
+    }
+    button:active { transform: scale(0.97); }
+    .school { font-size: 11px; color: #4ade80; margin-top: 24px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  </style>
+</head>
+<body>
+  <div class="icon">📡</div>
+  <h1>You're Offline</h1>
+  <p>MIST Portal needs an internet connection to load. Please check your connection and try again.</p>
+
+  <div class="card">
+    <h2>While you wait</h2>
+    <div class="tip">
+      <span>💾</span>
+      <p>Any data you already loaded is saved and will be available once you reconnect.</p>
+    </div>
+    <div class="tip">
+      <span>📶</span>
+      <p>Try turning Wi-Fi off and back on, or switching to mobile data.</p>
+    </div>
+    <div class="tip">
+      <span>🔄</span>
+      <p>Once you're back online, the portal will automatically reconnect.</p>
+    </div>
+  </div>
+
+  <button onclick="location.reload()">🔄 Try Again</button>
+
+  <p class="school">Makeni Islamic Society Trust · Lusaka, Zambia</p>
+
+  <script>
+    // Auto-reload when connection is restored
+    window.addEventListener('online', () => location.reload());
+  </script>
+</body>
+</html>

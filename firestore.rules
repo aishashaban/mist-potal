@@ -1,0 +1,91 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ──────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ── Users collection ──────────────────────────────────────
+    // Users can read & update their own profile
+    // Admins can read all profiles
+    // No one can write passwords (never stored here anyway)
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Public read collections ───────────────────────────────
+    // Any signed-in user can read these
+    // Only admins can write
+
+    match /announcements/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /staff/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /leadership/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /events/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /timetable/{grade} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /vacancies/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /gallery/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /settings/{doc} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ── Inbox ─────────────────────────────────────────────────
+    // Anyone signed in can create (submit applications)
+    // Only admins can read, update, delete
+    match /inbox/{id} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ── Reactions (likes & comments) ─────────────────────────
+    // Any signed-in user can read and write reactions
+    // Users can only delete their own comments (enforced in app logic)
+    match /reactions/{itemKey} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+  }
+}

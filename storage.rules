@@ -1,0 +1,45 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ── Helper functions ──────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
+    // ── Gallery uploads ───────────────────────────────────────
+    // Only admins can upload or delete gallery files
+    // Any signed-in user can view (read)
+    match /gallery/{filename} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+
+      // Max file size: 50MB. Images and videos only.
+      allow create: if isAdmin()
+        && request.resource.size < 50 * 1024 * 1024
+        && (request.resource.contentType.matches('image/.*')
+            || request.resource.contentType.matches('video/.*'));
+    }
+
+    // ── Profile avatars ───────────────────────────────────────
+    // Users can upload their own avatar only
+    // Max 5MB, images only
+    match /avatars/{uid}/{filename} {
+      allow read: if isSignedIn();
+      allow write: if request.auth.uid == uid
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // ── Block everything else ─────────────────────────────────
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
